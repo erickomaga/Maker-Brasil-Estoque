@@ -11,14 +11,14 @@ def get_db_connection():
 def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
-
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS produtos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nome TEXT NOT NULL UNIQUE,
+            nome TEXT NOT NULL, 
             categoria TEXT NOT NULL,
             em_estoque INTEGER NOT NULL,
-            necessario INTEGER NOT NULL
+            necessario INTEGER NOT NULL,
+            UNIQUE(nome, categoria) 
         )
     ''')
 
@@ -27,16 +27,30 @@ def init_db():
 
     if count == 0:
         produtos_iniciais = [
-            ('Tapete Lúdico', 'infantil', 15, 20),
-            ('Encartes', 'infantil', 150, 120),
-            ('Lego 9656', 'infantil', 8, 15),
-            ('Caracol', 'infantil', 30, 25),
-            ('Cards', 'infantil', 0, 50),
-            ('Lego 9686', 'fundamental1-2', 12, 10),
-            ('Lego WeDo', 'fundamental3-5', 5, 15),
-            ('Caneta 3D', 'fundamental3-5', 20, 20),
-            ('Filamento', 'fundamental3-5', 3, 10)
+            # Educação Infantil
+            ('Tapete Lúdico', 'infantil', 0, 10),
+            ('Encartes', 'infantil', 0, 10),
+            ('Lego 9656', 'infantil', 0, 10),
+            ('Caracol', 'infantil', 0, 10),
+            ('Cards', 'infantil', 0, 10),
+
+            # Fundamental 1: 1º e 2º Ano
+            ('Lego 9686', 'fundamental1-2', 0, 10),
+            ('Caracol', 'fundamental1-2', 0, 10),
+            ('Cards', 'fundamental1-2', 0, 10),
+            ('Tipos de Maker', 'fundamental1-2', 0, 10),
+
+            # Fundamental 1: 3º ao 5º Ano
+            ('Lego WeDo', 'fundamental3-5', 0, 10),
+            ('Lego We98', 'fundamental3-5', 0, 10),
+            ('Educação Financeira Maker', 'fundamental3-5', 0, 10),
+            ('Caneta 3D', 'fundamental3-5', 0, 10),
+            ('Filamento', 'fundamental3-5', 0, 10),
+            ('Tapete', 'fundamental3-5', 0, 10),
+            ('Caracol', 'fundamental3-5', 0, 10),
+            ('Cards', 'fundamental3-5', 0, 10)
         ]
+        
         cursor.executemany(
             'INSERT INTO produtos (nome, categoria, em_estoque, necessario) VALUES (?, ?, ?, ?)',
             produtos_iniciais
@@ -55,7 +69,7 @@ def editar():
 @app.route('/api/produtos')
 def get_produtos():
     conn = get_db_connection()
-    produtos = conn.execute('SELECT * FROM produtos').fetchall()
+    produtos = conn.execute('SELECT * FROM produtos ORDER BY categoria, nome').fetchall()
     conn.close()
     return jsonify([dict(row) for row in produtos])
 
