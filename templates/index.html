@@ -26,8 +26,6 @@
   <style>
     body { background-color: #0f172a; color: #e2e8f0; }
     .hidden { display: none; }
-
-    /* Estilos dos cards */
     .product-card, .edit-card {
       background-color: #1e293b;
       border-radius: 1rem;
@@ -35,6 +33,7 @@
       box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
       padding: 1.5rem;
       transition: all 0.3s ease;
+      position: relative;
     }
     .product-card:hover, .edit-card:hover {
       border-color: #3b82f6;
@@ -55,6 +54,29 @@
     .status-alerta-fixo, .bg-yellow-400 { background-color: #f59e0b; color: #1e293b; }
     .status-preocupante, .bg-orange-500 { background-color: #f97316; }
     .status-vazio, .bg-red-600 { background-color: #dc2626; }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background-color: #1e293b;
+      padding: 2rem;
+      border-radius: 1rem;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3), 0 4px 6px -2px rgba(0,0,0,0.05);
+      animation: fadeIn 0.3s ease-out;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
 <body class="font-sans antialiased pb-24">
@@ -62,13 +84,12 @@
     <div class="container mx-auto max-w-7xl px-6 py-4 flex justify-between items-center">
       <h1 class="font-display text-3xl font-bold text-white">Gestão de Estoque</h1>
       <nav class="flex items-center space-x-6">
-        <button id="tab-visualizar" class="tab-btn text-gray-300 hover:text-blue-400 font-semibold">Visualizar Estoque</button>
+        <button id="tab-visualizar" class="tab-btn text-blue-400 font-semibold border-b-2 border-blue-400">Visualizar Estoque</button>
         <button id="tab-editar" class="tab-btn text-gray-300 hover:text-blue-400 font-semibold">Editar Estoque</button>
       </nav>
     </div>
   </header>
 
-  <!-- VISUALIZAR -->
   <main id="visualizar" class="container mx-auto max-w-7xl px-6 py-12">
     <section id="infantil-view" class="py-12">
       <h2 class="font-display text-4xl font-bold text-white border-b-2 border-blue-600 inline-block pb-2 mb-8">Educação Infantil</h2>
@@ -84,9 +105,12 @@
     </section>
   </main>
 
-  <!-- EDITAR -->
   <main id="editar" class="container mx-auto max-w-7xl px-6 py-12 hidden">
-    <h2 class="font-display text-3xl font-semibold mb-10 text-center text-gray-300">Atualize as Quantidades</h2>
+    <h2 class="font-display text-3xl font-semibold mb-10 text-center text-gray-300">Atualize as Quantidades (Prioridade)</h2>
+
+    <div class="mb-8 text-center">
+      <p class="text-sm text-gray-400">Os produtos mais críticos (Vazio/Preocupante) são exibidos primeiro.</p>
+    </div>
 
     <section id="infantil-edit" class="py-10">
       <h2 class="font-display text-3xl font-bold text-white border-b-2 border-blue-600 inline-block pb-2 mb-8">Educação Infantil</h2>
@@ -103,36 +127,81 @@
 
     <div class="mt-12 pt-8 border-t border-slate-700 text-center">
       <button id="salvar" class="inline-flex items-center gap-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-10 py-4 rounded-xl font-semibold text-lg transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg hover:shadow-green-500/30">
-        💾 Salvar Alterações
+        💾 Salvar Alterações em Massa
       </button>
       <p id="mensagem" class="text-sm mt-4 transition-opacity opacity-0"></p>
     </div>
   </main>
 
+  <div id="modal-edicao" class="modal hidden">
+    <div class="modal-content">
+      <h3 class="font-display text-2xl font-semibold mb-4 text-white">Editar Estoque</h3>
+      <p id="modal-nome" class="text-lg mb-4 text-gray-300"></p>
+
+      <label for="modal-estoque" class="block text-sm text-gray-400 mb-2">Nova Quantidade em Estoque</label>
+      <input type="number" id="modal-estoque" min="0" class="w-full text-center text-2xl font-bold rounded-md bg-slate-800 border border-slate-600 text-white py-3 mb-6">
+      
+      <div class="flex justify-end space-x-4">
+        <button id="modal-cancelar" class="bg-slate-700 hover:bg-slate-600 text-white font-semibold px-4 py-2 rounded-lg transition duration-200">Cancelar</button>
+        <button id="modal-salvar" data-id="" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition duration-200">Salvar</button>
+      </div>
+      <p id="mensagem-individual" class="text-sm mt-4 text-center transition-opacity opacity-0"></p>
+    </div>
+  </div>
+
   <script>
+    const gridsView = {
+      infantil: document.getElementById('infantil-grid'),
+      'fundamental1-2': document.getElementById('fundamental1-2-grid'),
+      'fundamental3-5': document.getElementById('fundamental3-5-grid'),
+    };
+    const gridsEdit = {
+      infantil: document.getElementById('infantil-grid-edit'),
+      'fundamental1-2': document.getElementById('fundamental1-2-grid-edit'),
+      'fundamental3-5': document.getElementById('fundamental3-5-grid-edit'),
+    };
+    
+    function getStatusClass(v){if(v>100)return'bg-green-600';if(v>50)return'bg-yellow-400 text-gray-900';if(v>0)return'bg-orange-500';return'bg-red-600';}
+    function getStatusText(v){if(v>100)return'Tranquilo';if(v>50)return'Alerta';if(v>0)return'Preocupante';return'Estoque Vazio';}
+
+    function updateFixedStatus(card, estoque) {
+      const indicator = card.querySelector('.status-indicator');
+      indicator.className = 'status-indicator';
+      
+      const statusClass = getStatusClass(estoque)
+        .replace('bg-green-600', 'status-tranquilo')
+        .replace('bg-yellow-400 text-gray-900', 'status-alerta-fixo')
+        .replace('bg-orange-500', 'status-preocupante')
+        .replace('bg-red-600', 'status-vazio');
+      
+      indicator.classList.add(statusClass.split(' ')[0]); 
+      indicator.textContent = getStatusText(estoque);
+      
+      if(getStatusText(estoque) === 'Alerta') {
+        indicator.classList.add('text-gray-900');
+      } else {
+        indicator.classList.remove('text-gray-900');
+      }
+    }
+
     function criarCardProduto(produto) {
       const card = document.createElement('div');
       card.className = 'product-card';
       card.innerHTML = `
+        <button class="absolute top-4 right-4 text-gray-400 hover:text-blue-400" data-action="edit" data-id="${produto.id}" data-nome="${produto.nome}" data-estoque="${produto.em_estoque}">
+          ✏️
+        </button>
         <div>
           <h3 class="font-display text-xl font-semibold mb-2">${produto.nome}</h3>
           <div class="status-indicator"></div>
         </div>
         <div class="mt-4 border-t border-slate-700 pt-3">
           <p class="text-gray-400 text-sm mb-1">Estoque Atual</p>
-          <p class="text-2xl font-bold">${produto.em_estoque}</p>
+          <p class="text-2xl font-bold" data-estoque-display>${produto.em_estoque}</p>
         </div>
       `;
       updateFixedStatus(card, produto.em_estoque);
       return card;
-    }
-
-    function updateFixedStatus(card, estoque) {
-      const indicator = card.querySelector('.status-indicator');
-      if (estoque > 100) indicator.classList.add('status-tranquilo'), indicator.textContent = 'Tranquilo';
-      else if (estoque > 50) indicator.classList.add('status-alerta-fixo'), indicator.textContent = 'Alerta';
-      else if (estoque > 0) indicator.classList.add('status-preocupante'), indicator.textContent = 'Preocupante';
-      else indicator.classList.add('status-vazio'), indicator.textContent = 'Estoque Vazio';
     }
 
     function criarCardEditHTML(p) {
@@ -143,61 +212,145 @@
             <span class="status-badge ${getStatusClass(p.em_estoque)}">${getStatusText(p.em_estoque)}</span>
           </div>
           <label class="block text-sm text-gray-400 mb-2">Quantidade</label>
-          <input type="number" min="0" value="${p.em_estoque}" data-id="${p.id}" class="w-full text-center text-xl font-bold rounded-md bg-slate-800 border border-slate-600 py-2">
+          <input type="number" min="0" value="${p.em_estoque}" data-id="${p.id}" class="w-full text-center text-xl font-bold rounded-md bg-slate-800 border border-slate-600 py-2 text-white">
         </div>
       `;
     }
 
-    function getStatusClass(v){if(v>100)return'bg-green-600';if(v>50)return'bg-yellow-400 text-gray-900';if(v>0)return'bg-orange-500';return'bg-red-600';}
-    function getStatusText(v){if(v>100)return'Tranquilo';if(v>50)return'Alerta';if(v>0)return'Preocupante';return'Estoque Vazio';}
-
-    async function carregarProdutos(){
-      const res = await fetch('/api/produtos');
+    async function carregarProdutos(editMode = false){
+      const url = editMode ? '/api/produtos?sort_by=prioridade' : '/api/produtos';
+      const res = await fetch(url);
       const produtos = await res.json();
 
-      const gridsView = {
-        infantil: document.getElementById('infantil-grid'),
-        'fundamental1-2': document.getElementById('fundamental1-2-grid'),
-        'fundamental3-5': document.getElementById('fundamental3-5-grid'),
-      };
-      const gridsEdit = {
-        infantil: document.getElementById('infantil-grid-edit'),
-        'fundamental1-2': document.getElementById('fundamental1-2-grid-edit'),
-        'fundamental3-5': document.getElementById('fundamental3-5-grid-edit'),
-      };
-      Object.values({...gridsView,...gridsEdit}).forEach(g=>g.innerHTML='');
+      for (const key in gridsView) {
+        gridsView[key].innerHTML = '';
+        gridsEdit[key].innerHTML = '';
+      }
 
       produtos.forEach(p=>{
-        const card = criarCardProduto(p);
-        const cardEdit = criarCardEditHTML(p);
-        if(gridsView[p.categoria]) gridsView[p.categoria].appendChild(card);
-        if(gridsEdit[p.categoria]) gridsEdit[p.categoria].innerHTML += cardEdit;
+        
+        if (gridsView[p.categoria]) {
+          const card = criarCardProduto(p);
+          gridsView[p.categoria].appendChild(card);
+        }
+        
+        if (gridsEdit[p.categoria]) {
+          const cardEditHTML = criarCardEditHTML(p);
+          gridsEdit[p.categoria].innerHTML += cardEditHTML;
+        }
+      });
+
+      document.querySelectorAll('[data-action="edit"]').forEach(button => {
+        button.addEventListener('click', abrirModalEdicao);
       });
     }
 
-    async function salvarAlteracoes(){
+    async function salvarAlteracoesEmMassa(){
       const inputs=document.querySelectorAll('#editar input[type="number"]');
-      const dados=[...inputs].map(i=>({id:parseInt(i.dataset.id),emEstoque:parseInt(i.value),necessario:0}));
+      const dados=[...inputs].map(i=>({id:parseInt(i.dataset.id),emEstoque:parseInt(i.value),necessario:0})); 
+      
       const res=await fetch('/api/atualizar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(dados)});
       const result=await res.json();
+      
       const msg=document.getElementById('mensagem');
       msg.textContent=result.mensagem;
       msg.classList.remove('opacity-0');
       msg.classList.add('text-green-400');
+      
       setTimeout(()=>msg.classList.add('opacity-0'),3000);
-      carregarProdutos();
+      
+      carregarProdutos(true); 
+      carregarProdutos(false); 
+    }
+
+    const modal = document.getElementById('modal-edicao');
+    const modalEstoqueInput = document.getElementById('modal-estoque');
+    const modalSalvarBtn = document.getElementById('modal-salvar');
+    const mensagemIndividual = document.getElementById('mensagem-individual');
+
+    function abrirModalEdicao(event) {
+      const button = event.currentTarget;
+      const id = button.dataset.id;
+      const nome = button.dataset.nome;
+      const estoque = button.dataset.estoque;
+
+      document.getElementById('modal-nome').textContent = `Produto: ${nome}`;
+      modalEstoqueInput.value = estoque;
+      modalSalvarBtn.dataset.id = id;
+      modal.classList.remove('hidden');
+      mensagemIndividual.classList.add('opacity-0');
+    }
+
+    function fecharModalEdicao() {
+      modal.classList.add('hidden');
+      mensagemIndividual.classList.add('opacity-0');
+    }
+
+    async function salvarEdicaoIndividual() {
+      const id = modalSalvarBtn.dataset.id;
+      const emEstoque = parseInt(modalEstoqueInput.value);
+
+      if (isNaN(emEstoque) || emEstoque < 0) {
+        mensagemIndividual.textContent = '⚠️ Quantidade inválida!';
+        mensagemIndividual.classList.remove('opacity-0');
+        mensagemIndividual.classList.add('text-red-400');
+        return;
+      }
+
+      const res = await fetch('/api/atualizar/individual', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: parseInt(id), emEstoque: emEstoque })
+      });
+      const result = await res.json();
+
+      mensagemIndividual.textContent = result.mensagem;
+      mensagemIndividual.classList.remove('opacity-0');
+      mensagemIndividual.classList.add('text-green-400');
+
+      setTimeout(() => {
+        carregarProdutos(false); 
+        carregarProdutos(true); 
+        fecharModalEdicao();
+      }, 1500); 
     }
 
     document.addEventListener('DOMContentLoaded',()=>{
-      carregarProdutos();
-      document.getElementById('salvar').addEventListener('click',salvarAlteracoes);
+      carregarProdutos(false); 
+      
+      document.getElementById('salvar').addEventListener('click',salvarAlteracoesEmMassa);
+      
+      document.getElementById('modal-cancelar').addEventListener('click', fecharModalEdicao);
+      modalSalvarBtn.addEventListener('click', salvarEdicaoIndividual);
+      modal.addEventListener('click', (e) => { 
+        if (e.target === modal) fecharModalEdicao();
+      });
+
       const visualizar=document.getElementById('visualizar');
       const editar=document.getElementById('editar');
-      document.getElementById('tab-visualizar').addEventListener('click',()=>{
+      const tabVisualizar = document.getElementById('tab-visualizar');
+      const tabEditar = document.getElementById('tab-editar');
+      
+      tabVisualizar.classList.add('text-blue-400','border-b-2','border-blue-400');
+
+      tabVisualizar.addEventListener('click',()=>{
         visualizar.classList.remove('hidden'); editar.classList.add('hidden');
+        tabVisualizar.classList.add('text-blue-400','border-b-2','border-blue-400');
+        tabVisualizar.classList.remove('text-gray-300','hover:text-blue-400');
+
+        tabEditar.classList.remove('text-blue-400','border-b-2','border-blue-400');
+        tabEditar.classList.add('text-gray-300','hover:text-blue-400');
+        carregarProdutos(false); 
       });
-      document.getElementById('tab-editar').addEventListener('click',()=>{
+      
+      tabEditar.addEventListener('click',()=>{
         editar.classList.remove('hidden'); visualizar.classList.add('hidden');
+        tabEditar.classList.add('text-blue-400','border-b-2','border-blue-400');
+        tabEditar.classList.remove('text-gray-300','hover:text-blue-400');
+
+        tabVisualizar.classList.remove('text-blue-400','border-b-2','border-blue-400');
+        tabVisualizar.classList.add('text-gray-300','hover:text-blue-400');
+        carregarProdutos(true); 
       });
     });
   </script>
