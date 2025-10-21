@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Controle de Estoque - Maker Brasil</title>
-  
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
@@ -24,135 +24,103 @@
   </script>
 
   <style>
-    body {
-      background-color: #0f172a; 
-      color: #e2e8f0;
-    }
+    body { background-color: #0f172a; color: #e2e8f0; }
+    .hidden { display: none; }
 
-    .product-card {
-      background-color: #1e293b; 
+    /* Estilos dos cards */
+    .product-card, .edit-card {
+      background-color: #1e293b;
       border-radius: 1rem;
       border: 1px solid #334155;
-      overflow: hidden;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
       padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+      transition: all 0.3s ease;
     }
-    .product-card:hover {
-      transform: translateY(-5px);
-      border-color: #3b82f6; 
-      box-shadow: 0 0 25px rgba(59, 130, 246, 0.2);
-    }
-    .product-title {
-      font-family: 'Montserrat', sans-serif; 
-      font-size: 1.25rem; 
-      font-weight: 600; 
-      margin-bottom: 0.75rem; 
-      color: #e2e8f0; 
-    }
-    .status-wrapper {
-      text-align: center;
-      margin-bottom: 1rem;
-    }
-    .stock-info {
-      margin-top: 1rem; 
-      padding-top: 1rem;
-      border-top: 1px solid #334155; 
-    }
-    .stock-label {
-      font-size: 0.875rem; 
-      color: #94a3b8;
-      margin-bottom: 0.25rem; 
-    }
-    .stock-value {
-      font-size: 1.875rem; 
-      font-weight: 700; 
-      color: #ffffff; 
+    .product-card:hover, .edit-card:hover {
+      border-color: #3b82f6;
+      transform: translateY(-4px);
     }
 
-    .status-indicator {
+    .status-indicator, .status-badge {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
-      padding: 0.4rem 0.8rem;
       border-radius: 9999px;
-      font-size: 0.85rem;
+      padding: 0.4rem 0.8rem;
       font-weight: 700;
+      font-size: 0.85rem;
       color: white;
-      text-align: center;
-      transition: all 0.3s ease;
     }
-    .status-tranquilo { background-color: #16a34a; } 
-    .status-alerta-fixo { background-color: #f59e0b; color: #1e293b; } 
-    .status-preocupante { background-color: #f97316; } 
-    .status-vazio { background-color: #dc2626; } 
+    .status-tranquilo, .bg-green-600 { background-color: #16a34a; }
+    .status-alerta-fixo, .bg-yellow-400 { background-color: #f59e0b; color: #1e293b; }
+    .status-preocupante, .bg-orange-500 { background-color: #f97316; }
+    .status-vazio, .bg-red-600 { background-color: #dc2626; }
   </style>
 </head>
-
 <body class="font-sans antialiased pb-24">
   <header class="bg-slate-900/80 backdrop-blur-lg sticky top-0 z-50 shadow-lg shadow-black/30">
     <div class="container mx-auto max-w-7xl px-6 py-4 flex justify-between items-center">
       <h1 class="font-display text-3xl font-bold text-white">Gestão de Estoque</h1>
-      <nav class="hidden md:flex items-center space-x-8">
-        <a href="#infantil" class="text-gray-300 hover:text-blue-400 transition-colors">Educação Infantil</a>
-        <a href="#fundamental1-2" class="text-gray-300 hover:text-blue-400 transition-colors">Fundamental I (1º-2º)</a>
-        <a href="#fundamental3-5" class="text-gray-300 hover:text-blue-400 transition-colors">Fundamental I (3º-5º)</a>
+      <nav class="flex items-center space-x-6">
+        <button id="tab-visualizar" class="tab-btn text-gray-300 hover:text-blue-400 font-semibold">Visualizar Estoque</button>
+        <button id="tab-editar" class="tab-btn text-gray-300 hover:text-blue-400 font-semibold">Editar Estoque</button>
       </nav>
-      <a href="editar.html" 
-         class="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-5 py-2.5 rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105 shadow-md hover:shadow-lg">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-        </svg>
-        Editar Estoque
-      </a>
     </div>
   </header>
 
-  <main class="container mx-auto max-w-7xl px-6 py-12">
-    <section id="infantil" class="py-16">
-      <div class="text-center mb-12">
-        <h2 class="font-display text-4xl font-bold text-white border-b-2 border-blue-600 inline-block pb-2">Educação Infantil</h2>
-        <p class="text-lg text-gray-400 mt-4">Kits e materiais para os pequenos.</p>
-      </div>
+  <!-- VISUALIZAR -->
+  <main id="visualizar" class="container mx-auto max-w-7xl px-6 py-12">
+    <section id="infantil-view" class="py-12">
+      <h2 class="font-display text-4xl font-bold text-white border-b-2 border-blue-600 inline-block pb-2 mb-8">Educação Infantil</h2>
       <div id="infantil-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"></div>
     </section>
-
-    <section id="fundamental1-2" class="py-16 bg-slate-800/20 rounded-3xl">
-      <div class="text-center mb-12">
-        <h2 class="font-display text-4xl font-bold text-white border-b-2 border-blue-600 inline-block pb-2">Fundamental I: 1º e 2º Ano</h2>
-        <p class="text-lg text-gray-400 mt-4">Materiais para o ciclo inicial.</p>
-      </div>
-      <div id="fundamental1-2-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 px-8"></div>
+    <section id="fundamental1-2-view" class="py-12">
+      <h2 class="font-display text-4xl font-bold text-white border-b-2 border-blue-600 inline-block pb-2 mb-8">Fundamental I: 1º e 2º Ano</h2>
+      <div id="fundamental1-2-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"></div>
     </section>
-
-    <section id="fundamental3-5" class="py-16">
-      <div class="text-center mb-12">
-        <h2 class="font-display text-4xl font-bold text-white border-b-2 border-blue-600 inline-block pb-2">Fundamental I: 3º ao 5º Ano</h2>
-        <p class="text-lg text-gray-400 mt-4">Materiais para o ciclo intermediário.</p>
-      </div>
+    <section id="fundamental3-5-view" class="py-12">
+      <h2 class="font-display text-4xl font-bold text-white border-b-2 border-blue-600 inline-block pb-2 mb-8">Fundamental I: 3º ao 5º Ano</h2>
       <div id="fundamental3-5-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"></div>
     </section>
   </main>
 
+  <!-- EDITAR -->
+  <main id="editar" class="container mx-auto max-w-7xl px-6 py-12 hidden">
+    <h2 class="font-display text-3xl font-semibold mb-10 text-center text-gray-300">Atualize as Quantidades</h2>
+
+    <section id="infantil-edit" class="py-10">
+      <h2 class="font-display text-3xl font-bold text-white border-b-2 border-blue-600 inline-block pb-2 mb-8">Educação Infantil</h2>
+      <div id="infantil-grid-edit" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8"></div>
+    </section>
+    <section id="fundamental1-2-edit" class="py-10">
+      <h2 class="font-display text-3xl font-bold text-white border-b-2 border-blue-600 inline-block pb-2 mb-8">Fundamental I: 1º e 2º Ano</h2>
+      <div id="fundamental1-2-grid-edit" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8"></div>
+    </section>
+    <section id="fundamental3-5-edit" class="py-10">
+      <h2 class="font-display text-3xl font-bold text-white border-b-2 border-blue-600 inline-block pb-2 mb-8">Fundamental I: 3º ao 5º Ano</h2>
+      <div id="fundamental3-5-grid-edit" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8"></div>
+    </section>
+
+    <div class="mt-12 pt-8 border-t border-slate-700 text-center">
+      <button id="salvar" class="inline-flex items-center gap-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-10 py-4 rounded-xl font-semibold text-lg transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg hover:shadow-green-500/30">
+        💾 Salvar Alterações
+      </button>
+      <p id="mensagem" class="text-sm mt-4 transition-opacity opacity-0"></p>
+    </div>
+  </main>
+
   <script>
     function criarCardProduto(produto) {
-      const card = document.createElement("div");
-      card.className = "product-card"; 
-      
+      const card = document.createElement('div');
+      card.className = 'product-card';
       card.innerHTML = `
         <div>
-          <h3 class="product-title">${produto.nome}</h3>
-          <div class="status-wrapper">
-            <div class="status-indicator"></div>
-          </div>
+          <h3 class="font-display text-xl font-semibold mb-2">${produto.nome}</h3>
+          <div class="status-indicator"></div>
         </div>
-        <div class="stock-info">
-            <p class="stock-label">Estoque Atual</p>
-            <p class="stock-value">${produto.em_estoque}</p>
+        <div class="mt-4 border-t border-slate-700 pt-3">
+          <p class="text-gray-400 text-sm mb-1">Estoque Atual</p>
+          <p class="text-2xl font-bold">${produto.em_estoque}</p>
         </div>
       `;
       updateFixedStatus(card, produto.em_estoque);
@@ -160,52 +128,78 @@
     }
 
     function updateFixedStatus(card, estoque) {
-      const indicator = card.querySelector(".status-indicator");
-      indicator.className = "status-indicator";
-
-      if (estoque > 100) {
-        indicator.classList.add("status-tranquilo");
-        indicator.textContent = "Tranquilo";
-      } else if (estoque > 50) {
-        indicator.classList.add("status-alerta-fixo");
-        indicator.textContent = "Alerta";
-      } else if (estoque > 0) {
-        indicator.classList.add("status-preocupante");
-        indicator.textContent = "Preocupante";
-      } else {
-        indicator.classList.add("status-vazio");
-        indicator.textContent = "Estoque Vazio";
-      }
+      const indicator = card.querySelector('.status-indicator');
+      if (estoque > 100) indicator.classList.add('status-tranquilo'), indicator.textContent = 'Tranquilo';
+      else if (estoque > 50) indicator.classList.add('status-alerta-fixo'), indicator.textContent = 'Alerta';
+      else if (estoque > 0) indicator.classList.add('status-preocupante'), indicator.textContent = 'Preocupante';
+      else indicator.classList.add('status-vazio'), indicator.textContent = 'Estoque Vazio';
     }
 
-    async function carregarProdutosDaAPI() {
-      const grids = {
-        infantil: document.getElementById("infantil-grid"),
-        "fundamental1-2": document.getElementById("fundamental1-2-grid"),
-        "fundamental3-5": document.getElementById("fundamental3-5-grid"),
+    function criarCardEditHTML(p) {
+      return `
+        <div class="edit-card">
+          <div class="flex justify-between items-start mb-2">
+            <h2 class="font-display text-lg font-semibold">${p.nome}</h2>
+            <span class="status-badge ${getStatusClass(p.em_estoque)}">${getStatusText(p.em_estoque)}</span>
+          </div>
+          <label class="block text-sm text-gray-400 mb-2">Quantidade</label>
+          <input type="number" min="0" value="${p.em_estoque}" data-id="${p.id}" class="w-full text-center text-xl font-bold rounded-md bg-slate-800 border border-slate-600 py-2">
+        </div>
+      `;
+    }
+
+    function getStatusClass(v){if(v>100)return'bg-green-600';if(v>50)return'bg-yellow-400 text-gray-900';if(v>0)return'bg-orange-500';return'bg-red-600';}
+    function getStatusText(v){if(v>100)return'Tranquilo';if(v>50)return'Alerta';if(v>0)return'Preocupante';return'Estoque Vazio';}
+
+    async function carregarProdutos(){
+      const res = await fetch('/api/produtos');
+      const produtos = await res.json();
+
+      const gridsView = {
+        infantil: document.getElementById('infantil-grid'),
+        'fundamental1-2': document.getElementById('fundamental1-2-grid'),
+        'fundamental3-5': document.getElementById('fundamental3-5-grid'),
       };
+      const gridsEdit = {
+        infantil: document.getElementById('infantil-grid-edit'),
+        'fundamental1-2': document.getElementById('fundamental1-2-grid-edit'),
+        'fundamental3-5': document.getElementById('fundamental3-5-grid-edit'),
+      };
+      Object.values({...gridsView,...gridsEdit}).forEach(g=>g.innerHTML='');
 
-      try {
-        const res = await fetch('/api/produtos');
-        if (!res.ok) throw new Error('Falha ao carregar produtos');
-        const produtos = await res.json();
-
-        Object.values(grids).forEach(grid => grid.innerHTML = '');
-
-        produtos.forEach((produto) => {
-          const card = criarCardProduto(produto);
-          if (grids[produto.categoria]) {
-            grids[produto.categoria].appendChild(card);
-          } else {
-            console.warn(`Categoria desconhecida: ${produto.categoria} para o produto ${produto.nome}`);
-          }
-        });
-      } catch (error) {
-        console.error('Erro ao carregar produtos:', error);
-      }
+      produtos.forEach(p=>{
+        const card = criarCardProduto(p);
+        const cardEdit = criarCardEditHTML(p);
+        if(gridsView[p.categoria]) gridsView[p.categoria].appendChild(card);
+        if(gridsEdit[p.categoria]) gridsEdit[p.categoria].innerHTML += cardEdit;
+      });
     }
 
-    document.addEventListener("DOMContentLoaded", carregarProdutosDaAPI);
+    async function salvarAlteracoes(){
+      const inputs=document.querySelectorAll('#editar input[type="number"]');
+      const dados=[...inputs].map(i=>({id:parseInt(i.dataset.id),emEstoque:parseInt(i.value),necessario:0}));
+      const res=await fetch('/api/atualizar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(dados)});
+      const result=await res.json();
+      const msg=document.getElementById('mensagem');
+      msg.textContent=result.mensagem;
+      msg.classList.remove('opacity-0');
+      msg.classList.add('text-green-400');
+      setTimeout(()=>msg.classList.add('opacity-0'),3000);
+      carregarProdutos();
+    }
+
+    document.addEventListener('DOMContentLoaded',()=>{
+      carregarProdutos();
+      document.getElementById('salvar').addEventListener('click',salvarAlteracoes);
+      const visualizar=document.getElementById('visualizar');
+      const editar=document.getElementById('editar');
+      document.getElementById('tab-visualizar').addEventListener('click',()=>{
+        visualizar.classList.remove('hidden'); editar.classList.add('hidden');
+      });
+      document.getElementById('tab-editar').addEventListener('click',()=>{
+        editar.classList.remove('hidden'); visualizar.classList.add('hidden');
+      });
+    });
   </script>
 </body>
 </html>
