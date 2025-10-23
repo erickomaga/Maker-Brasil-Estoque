@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Controle de Estoque - Maker Brasil</title>
 
-  <!-- Favicons -->
   <link rel="apple-touch-icon" sizes="57x57" href="{{ url_for('static', filename='Imgs/FavIcons/apple-icon-57x57.png') }}">
   <link rel="apple-touch-icon" sizes="60x60" href="{{ url_for('static', filename='Imgs/FavIcons/apple-icon-60x60.png') }}">
   <link rel="apple-touch-icon" sizes="72x72" href="{{ url_for('static', filename='Imgs/FavIcons/apple-icon-72x72.png') }}">
@@ -123,7 +122,16 @@
       <h2 class="font-display text-4xl font-bold text-white border-b-2 border-blue-600 inline-block pb-2 mb-8">Fundamental I: 3º ao 5º Ano</h2>
       <div id="fundamental3-5-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"></div>
     </section>
-  </main>
+
+    <section id="fundamental2-view" class="py-12">
+      <h2 class="font-display text-4xl font-bold text-white border-b-2 border-blue-600 inline-block pb-2 mb-8">Fundamental II: 6º ao 9º Ano</h2>
+      <div id="fundamental2-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"></div>
+    </section>
+    <section id="ensino-medio-view" class="py-12">
+      <h2 class="font-display text-4xl font-bold text-white border-b-2 border-blue-600 inline-block pb-2 mb-8">Ensino Médio</h2>
+      <div id="ensino_medio-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"></div>
+    </section>
+    </main>
 
   <main id="editar" class="container mx-auto max-w-7xl px-6 py-12 hidden">
     <h2 class="font-display text-3xl font-semibold mb-10 text-center text-gray-300">Atualize as Quantidades (Prioridade)</h2>
@@ -145,6 +153,14 @@
       <div id="fundamental3-5-grid-edit" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8"></div>
     </section>
 
+    <section id="fundamental2-edit" class="py-10">
+      <h2 class="font-display text-3xl font-bold text-white border-b-2 border-blue-600 inline-block pb-2 mb-8">Fundamental II: 6º ao 9º Ano</h2>
+      <div id="fundamental2-grid-edit" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8"></div>
+    </section>
+    <section id="ensino-medio-edit" class="py-10">
+      <h2 class="font-display text-3xl font-bold text-white border-b-2 border-blue-600 inline-block pb-2 mb-8">Ensino Médio</h2>
+      <div id="ensino_medio-grid-edit" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8"></div>
+    </section>
     <div class="mt-12 pt-8 border-t border-slate-700 text-center">
       <button id="salvar" class="inline-flex items-center gap-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-10 py-4 rounded-xl font-semibold text-lg transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg hover:shadow-green-500/30">
         💾 Salvar Alterações em Massa
@@ -170,16 +186,22 @@
   </div>
 
   <script>
+    // ### OBJETOS JS ATUALIZADOS ###
     const gridsView = {
       infantil: document.getElementById('infantil-grid'),
       'fundamental1-2': document.getElementById('fundamental1-2-grid'),
       'fundamental3-5': document.getElementById('fundamental3-5-grid'),
+      'fundamental2': document.getElementById('fundamental2-grid'),
+      'ensino_medio': document.getElementById('ensino_medio-grid')
     };
     const gridsEdit = {
       infantil: document.getElementById('infantil-grid-edit'),
       'fundamental1-2': document.getElementById('fundamental1-2-grid-edit'),
       'fundamental3-5': document.getElementById('fundamental3-5-grid-edit'),
+      'fundamental2': document.getElementById('fundamental2-grid-edit'),
+      'ensino_medio': document.getElementById('ensino_medio-grid-edit')
     };
+    // ### FIM DA ATUALIZAÇÃO JS ###
     
     function getStatusClass(v){if(v>100)return'bg-green-600';if(v>50)return'bg-yellow-400 text-gray-900';if(v>0)return'bg-orange-500';return'bg-red-600';}
     function getStatusText(v){if(v>100)return'Tranquilo';if(v>50)return'Alerta';if(v>0)return'Preocupante';return'Estoque Vazio';}

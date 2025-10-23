@@ -33,19 +33,32 @@ def init_db():
 
     if count == 0:
         produtos_iniciais = [
-            ('Tapete Lúdico', 'infantil', 120, 10), # Tranquilo
-            ('Encartes', 'infantil', 35, 10),      # Preocupante
-            ('Lego 9656', 'infantil', 0, 10),       # Vazio
-            ('Caracol', 'infantil', 80, 10),       # Alerta
-            ('Cards', 'infantil', 10, 10),         # Preocupante
+            # Infantil 
+            ('Tapete Lúdico', 'infantil', 120, 10), 
+            ('Encartes', 'infantil', 35, 10),
+            ('Lego 9656', 'infantil', 0, 10),
+            ('Caracol', 'infantil', 80, 10),
+            ('Cards', 'infantil', 10, 10),
+            ('Maker 1', 'infantil', 0, 10),
+            ('Maker 2', 'infantil', 0, 10),
+            ('Maker 3', 'infantil', 0, 10),
+            ('box 1', 'infantil', 0, 10),
+            ('box 2', 'infantil', 0, 10),
+            ('box 3', 'infantil', 0, 10),
 
-            # Fundamental 1: 1º e 2º Ano
+            # Fundamental 1: 1º e 2º Ano 
             ('Lego 9686', 'fundamental1-2', 150, 10),
             ('Caracol', 'fundamental1-2', 60, 10),
             ('Cards', 'fundamental1-2', 0, 10),
             ('Tipos de Maker', 'fundamental1-2', 20, 10),
+            ('Maker 1', 'fundamental1-2', 0, 10),
+            ('Maker 2', 'fundamental1-2', 0, 10),
+            ('apostila 1 ano', 'fundamental1-2', 0, 10),
+            ('apostila 2 ano', 'fundamental1-2', 0, 10),
+            ('box 1 ano', 'fundamental1-2', 0, 10),
+            ('box 2 ano', 'fundamental1-2', 0, 10),
 
-            # Fundamental 1: 3º ao 5º Ano
+            # Fundamental 1: 3º ao 5º Ano 
             ('Lego WeDo', 'fundamental3-5', 180, 10),
             ('Lego We98', 'fundamental3-5', 10, 10),
             ('Educação Financeira Maker', 'fundamental3-5', 0, 10),
@@ -53,7 +66,32 @@ def init_db():
             ('Filamento', 'fundamental3-5', 105, 10),
             ('Tapete', 'fundamental3-5', 45, 10),
             ('Caracol', 'fundamental3-5', 70, 10),
-            ('Cards', 'fundamental3-5', 25, 10)
+            ('Cards', 'fundamental3-5', 25, 10),
+            ('apostila 3 ano', 'fundamental3-5', 0, 10),
+            ('apostila 4 ano', 'fundamental3-5', 0, 10),
+            ('apostila 5 ano', 'fundamental3-5', 0, 10),
+            ('Maker 3 ano', 'fundamental3-5', 0, 10),
+            ('Maker 4 ano', 'fundamental3-5', 0, 10),
+            ('Maker 5 ano', 'fundamental3-5', 0, 10),
+            
+            # Fundamental 2 
+            ('lego ev3', 'fundamental2', 0, 10),
+            ('apostila 6 ano', 'fundamental2', 0, 10),
+            ('Maker 6 ano', 'fundamental2', 0, 10),
+            ('apostila 7 ano', 'fundamental2', 0, 10),
+            ('Maker 7 ano', 'fundamental2', 0, 10),
+            ('apostila 8 ano', 'fundamental2', 0, 10),
+            ('Maker 8 ano', 'fundamental2', 0, 10),
+            ('apostila 9 ano', 'fundamental2', 0, 10),
+            ('Maker 9 ano', 'fundamental2', 0, 10),
+
+            # Ensino Médio 
+            ('arduíno 1 em', 'ensino_medio', 0, 10),
+            ('arduíno 2 em', 'ensino_medio', 0, 10),
+            ('arduíno 3 em', 'ensino_medio', 0, 10),
+            ('apostila 1 em', 'ensino_medio', 0, 10),
+            ('apostila 2 em', 'ensino_medio', 0, 10),
+            ('apostila 3 em', 'ensino_medio', 0, 10)
         ]
         
         cursor.executemany(
